@@ -1,0 +1,49 @@
+kind: StatefulSet
+apiVersion: apps/v1
+metadata:
+  name: tibero7
+  namespace: pocdb
+  labels:
+    app: tibero7
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tibero7
+  template:
+    metadata:
+      labels:
+        app: tibero7
+    spec:
+      securityContext:
+        runAsUser: 0
+      containers:
+        - name: tibero7
+          resources: {}
+          command:
+            - bash
+            - '-c'
+          ports:
+            - name: http
+              containerPort: 8629
+              protocol: TCP
+          image: 'icispoc.azurecr.io/tibero7:230303'
+          args:
+            - bash /root/initdb/start.bash; /usr/bin/sleep infinity
+          volumeMounts:
+          - name: license
+            mountPath: "/tibero/license/license.xml"
+            readOnly: true
+            subPath: "license.xml"
+          - name: initdb
+            mountPath: "/root/initdb"
+      volumes:
+      - name: license
+        configMap:
+          name: tibero7-license-cm
+          items:
+          - key: "license.xml"
+            path: "license.xml"
+      - name: initdb
+        configMap:
+          name: tibero7-initdb-cm
