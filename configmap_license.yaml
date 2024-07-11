@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tibero7-license-cm
+data:
+  license.xml: |
+    <?xml version="1.0" encoding="ISO-8859-1"?>
+    <tmax_license>
+            <license version="1.0">
+                    <product version="7">Tibero</product>
+                    <serial_ID>1678343049</serial_ID>
+                    <issue_date>2023/03/09</issue_date>
+                    <start_date>2023/03/09</start_date>
+                    <end_date>2025/02/28</end_date>
+                    <licensee>valid for KT ICIS Tr Cloud use only</licensee>
+                    <edition>enterprise</edition>
+                    <type>cloud</type>
+                    <cloud_duration>723</cloud_duration>
+                    <identified_by_host>UNLIMITED_FOR_HOSTNAME</identified_by_host>
+                    <signature>s3mY81XTDe6E+cKedUWVz5oRyyk1wberH59lXEmh2ZU=</signature>
+            </license>
+    </tmax_license>     
