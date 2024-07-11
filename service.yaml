@@ -1,0 +1,14 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: tibero7
+  namespace: pocdb
+spec:
+  ports:
+    - name: tibero
+      protocol: TCP
+      port: 8629
+      targetPort: 8629
+  type: ClusterIP
+  selector:
+    app: tibero7
