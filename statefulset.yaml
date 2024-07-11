@@ -2,7 +2,6 @@ kind: StatefulSet
 apiVersion: apps/v1
 metadata:
   name: tibero7
-  namespace: pocdb
   labels:
     app: tibero7
 spec:
@@ -27,7 +26,7 @@ spec:
             - name: http
               containerPort: 8629
               protocol: TCP
-          image: 'icispoc.azurecr.io/tibero7:230303'
+          image: myharbor.apps.okd4.ktdemo.duckdns.org/icis/tibero7:230303 # 'icispoc.azurecr.io/tibero7:230303'
           args:
             - bash /root/initdb/start.bash; /usr/bin/sleep infinity
           volumeMounts:
