@@ -1,0 +1,79 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tibero7-initdb-cm
+data:
+  create_db.sql: |
+    create database 
+    user sys identified by tibero
+    maxinstances 8
+    maxdatafiles 100
+    character set MSWIN949
+    national character set UTF16
+    logfile
+    group 1 'log001.log' size 50M,
+    group 2 'log002.log' size 50M,
+    group 3 'log003.log' size 50M
+    maxloggroups 255
+    maxlogmembers 8
+    noarchivelog
+    datafile 'system001.dtf' size 100M autoextend on next 10M maxsize unlimited
+    default temporary tablespace TEMP
+    tempfile 'temp001.dtf' size 100M autoextend on next 10M maxsize unlimited
+    extent management local autoallocate
+    undo tablespace UNDO
+    datafile 'undo001.dtf' size 200M autoextend on next 10M maxsize unlimited
+    extent management local autoallocate
+    SYSSUB
+    datafile 'syssub001.dtf' size 10M autoextend on next 10M maxsize unlimited
+    default tablespace USR
+    datafile 'usr001.dtf' size 100M autoextend on next 10M maxsize unlimited
+    extent management local autoallocate;
+  start.bash: |
+    #!/bin/bash
+
+    if [ -f /tibero/database/satibero/c1.ctl ]; then
+        # if [ -f /tibero/config/satibero.tip ]; then
+
+        # Tibero .bash_profile
+        export TB_HOME=/tibero
+        export TB_SID=satibero
+        export LD_LIBRARY_PATH=$TB_HOME/lib:$TB_HOME/client/lib
+        export PATH=$PATH:$TB_HOME/bin:$TB_HOME/client/bin
+
+        function dn() { return 0; } #Do Nothing.
+        function fdt() { date +%Y%m%d%H%M:%S:%N; }
+        function output() { echo -e "`fdt`:\e[92m$@\e[0m"; }
+
+        output "--- Executing TB_CONFIG/gen_tip.sh ---"
+        $TB_HOME/config/gen_tip.sh
+
+        output "--- tbboot ---"
+        $TB_HOME/bin/tbboot
+    else
+
+        # Tibero .bash_profile
+        export TB_HOME=/tibero
+        export TB_SID=satibero
+        export LD_LIBRARY_PATH=$TB_HOME/lib:$TB_HOME/client/lib
+        export PATH=$PATH:$TB_HOME/bin:$TB_HOME/client/bin
+
+        function dn() { return 0; } #Do Nothing.
+        function fdt() { date +%Y%m%d%H%M:%S:%N; }
+        function output() { echo -e "`fdt`:\e[92m$@\e[0m"; }
+
+        output "--- Executing TB_CONFIG/gen_tip.sh ---"
+        $TB_HOME/config/gen_tip.sh
+
+        output "--- Creating the Database with create_db.sql ---"
+        cd ~/initdb
+
+        $TB_HOME/bin/tbboot nomount
+        $TB_HOME/client/bin/tbsql sys/tibero @create_db.sql
+
+        output "--- Creating DB view / package ---"
+        $TB_HOME/bin/tbboot
+        $TB_HOME/scripts/system.sh -p1 tibero -p2 syscat -a1 Y -a2 Y -a3 Y -a4 Y
+
+        output "--- Init DB JOB finished ---"
+    fi
